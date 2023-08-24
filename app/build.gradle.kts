@@ -9,6 +9,8 @@ plugins {
 dependencies {
     implementation("org.apache.commons:commons-text")
     implementation(project(":utilities"))
+    implementation(project(":list"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
 }
 
 application {

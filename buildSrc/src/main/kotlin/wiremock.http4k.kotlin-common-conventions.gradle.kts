@@ -19,7 +19,7 @@ dependencies {
     }
 
     // Use JUnit Jupiter for testing.
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -27,4 +27,25 @@ dependencies {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    systemProperty("kotest.framework.classpath.scanning.config.disable", "true")
+    systemProperty("kotest.framework.classpath.scanning.autoscan.disable", "true")
+}
+
+configure<JavaPluginExtension> {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+
+    @Suppress("UnstableApiUsage")
+    consistentResolution {
+        useCompileClasspathVersions()
+    }
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
+dependencyLocking {
+    lockAllConfigurations()
 }

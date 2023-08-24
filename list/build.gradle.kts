@@ -5,3 +5,7 @@
 plugins {
     id("wiremock.http4k.kotlin-library-conventions")
 }
+
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+}

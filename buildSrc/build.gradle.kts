@@ -14,4 +14,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
+    implementation("org.jmailen.kotlinter:org.jmailen.kotlinter.gradle.plugin:3.16.0")
+    implementation("com.dorongold.task-tree:com.dorongold.task-tree.gradle.plugin:2.1.1")
+    implementation("com.github.ben-manes.versions:com.github.ben-manes.versions.gradle.plugin:0.47.0")
 }

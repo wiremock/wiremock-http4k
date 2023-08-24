@@ -3,9 +3,8 @@
  */
 package wiremock.http4k.app
 
-import wiremock.http4k.utilities.StringUtils
-
 import org.apache.commons.text.WordUtils
+import wiremock.http4k.utilities.StringUtils
 
 fun main() {
     val tokens = StringUtils.split(MessageUtils.getMessage())

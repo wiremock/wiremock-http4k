@@ -10,4 +10,13 @@ plugins {
 }
 
 rootProject.name = "wiremock-http4k"
-include("app", "list", "utilities")
+
+createProject("src/app", ":app")
+createProject("src/email", ":email")
+
+fun Settings.createProject(projectDir: String, projectName: String) {
+  include(projectName)
+  project(projectName).projectDir = projectDir.toFile()
+}
+
+fun String.toFile() = File(this)

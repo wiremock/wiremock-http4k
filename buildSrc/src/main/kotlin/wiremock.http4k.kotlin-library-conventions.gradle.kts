@@ -12,7 +12,6 @@ dependencies {
   testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
   testImplementation("io.kotest:kotest-framework-api:$kotestVersion")
   testImplementation("io.kotest:kotest-assertions-shared:$kotestVersion")
-  testImplementation("com.fasterxml.jackson.core:jackson-databind")
 
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

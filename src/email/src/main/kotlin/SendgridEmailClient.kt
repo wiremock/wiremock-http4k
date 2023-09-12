@@ -43,12 +43,7 @@ class SendgridEmailClient(
       .body(Body(body1))
 
     val response = client.invoke(request)
-    if (response.status.clientError) {
-//      throw ValidationException(
-//        "Not a valid email address",
-//        "$recipientAddress is not a valid email address.",
-//      )
-    }
+
     require(response.status.successful) {
       "Got [${response.status}] with body [${response.bodyString()}]"
     }

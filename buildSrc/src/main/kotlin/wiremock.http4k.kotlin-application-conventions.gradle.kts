@@ -1,4 +1,4 @@
 plugins {
-    application
-    id("wiremock.http4k.kotlin-common-conventions")
+  application
+  id("wiremock.http4k.kotlin-common-conventions")
 }

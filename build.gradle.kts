@@ -4,9 +4,9 @@ import com.github.gundy.semver4j.model.Version
 plugins {
     base
     id("com.autonomousapps.dependency-analysis") version "1.21.0"
-    id("org.jmailen.kotlinter")
-    id("com.dorongold.task-tree")
-    id("com.github.ben-manes.versions")
+    id("org.jmailen.kotlinter") version "3.16.0"
+    id("com.dorongold.task-tree") version "2.1.1"
+    id("com.github.ben-manes.versions") version "0.47.0"
 }
 
 buildscript {

@@ -32,9 +32,9 @@ jobs:
         with:
           check_name: Unit Test Results
           junit_files: |
-            build/test-results/**/*.xml
+            **/test-results/**/*.xml
 
-      - name: Archive test results
+      - name: Archive build results
         uses: actions/upload-artifact@v3
         if: failure()
         with:

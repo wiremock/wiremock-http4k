@@ -1,29 +1,30 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+  id("org.jetbrains.kotlin.jvm")
+  id("org.jmailen.kotlinter")
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
+  // Use Maven Central for resolving dependencies.
+  mavenCentral()
 }
 
 
 
 configure<JavaPluginExtension> {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(17))
+  }
 
-    @Suppress("UnstableApiUsage")
-    consistentResolution {
-        useCompileClasspathVersions()
-    }
+  @Suppress("UnstableApiUsage")
+  consistentResolution {
+    useCompileClasspathVersions()
+  }
 }
 
 tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
+  options.encoding = "UTF-8"
 }
 
 dependencyLocking {
-    lockAllConfigurations()
+  lockAllConfigurations()
 }

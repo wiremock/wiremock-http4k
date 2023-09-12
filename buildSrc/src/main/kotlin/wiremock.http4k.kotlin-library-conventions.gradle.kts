@@ -8,10 +8,11 @@ plugins {
 
 dependencies {
 
-  val kotestVersion = "5.6.2"
-  testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-  testImplementation("io.kotest:kotest-framework-api:$kotestVersion")
-  testImplementation("io.kotest:kotest-assertions-shared:$kotestVersion")
+  val kotestVersion = "5.7.2"
+  testImplementation(platform("io.kotest:kotest-bom:$kotestVersion"))
+  testImplementation("io.kotest:kotest-runner-junit5")
+  testImplementation("io.kotest:kotest-framework-api")
+//  testImplementation("io.kotest:kotest-assertions-shared")
 
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

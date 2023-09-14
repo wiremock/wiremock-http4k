@@ -24,25 +24,37 @@ class WireMockHttp4kRequestAdapter(
   private val http4KRequest: Http4kRequest,
 ) : WireMockRequestBase {
 
-  override fun getUrl(): String = StringBuilder()
+  private val _httpHeaders =
+    HttpHeaders(
+      http4KRequest.headers
+        .map { (name, value) -> CaseInsensitiveKey(name) to value!! }
+        .groupBy({ it.first }, { it.second })
+        .map { (name, values) -> HttpHeader(name, values) },
+    )
+
+  private val url = StringBuilder()
     .append(
       when {
         http4KRequest.uri.path.isBlank() || http4KRequest.uri.path.startsWith("/") ->
           http4KRequest.uri.path
+
         else -> "/${http4KRequest.uri.path}"
       },
     )
     .appendIfNotBlank(http4KRequest.uri.query, "?", http4KRequest.uri.query)
     .toString()
 
-  override fun getAbsoluteUrl(): String? =
-    if (http4KRequest.uri.isAbsolute()) {
-      http4KRequest.uri.toString()
-    } else {
-      null
-    }
+  override fun getUrl(): String = url
 
-  override fun getMethod(): RequestMethod = when (http4KRequest.method) {
+  private val absoluteUrl = if (http4KRequest.uri.isAbsolute()) {
+    http4KRequest.uri.toString()
+  } else {
+    null
+  }
+
+  override fun getAbsoluteUrl(): String? = absoluteUrl
+
+  private val method = when (http4KRequest.method) {
     Method.GET -> RequestMethod.GET
     Method.POST -> RequestMethod.POST
     Method.PUT -> RequestMethod.PUT
@@ -53,51 +65,51 @@ class WireMockHttp4kRequestAdapter(
     Method.PURGE -> throw UnsupportedOperationException(
       "HTTP method PURGE is not supported in WireMock"
     )
+
     Method.HEAD -> RequestMethod.HEAD
   }
+
+  override fun getMethod(): RequestMethod = method
 
   override fun getScheme(): String? {
     return http4KRequest.uri.scheme.ifEmpty { null }
   }
 
-  override fun getHost(): String? {
+  private val host = run {
     val hostHeader = header("Host")
-    return if (hostHeader.isPresent) {
+    if (hostHeader.isPresent) {
       hostHeader.firstValue().substringBefore(":")
     } else {
       http4KRequest.source?.address
     }
   }
 
-  override fun getPort(): Int {
+  override fun getHost(): String? = host
+
+  private val _port by lazy {
     val hostHeader = header("Host")
-    return if (hostHeader.isPresent && hostHeader.firstValue().contains(":")) {
+    if (hostHeader.isPresent && hostHeader.firstValue().contains(":")) {
       hostHeader.firstValue().substringAfter(':').toInt()
     } else {
       http4KRequest.source?.port ?: 80
     }
   }
 
-  override fun getClientIp(): String? {
-    return getHeader("X-Forwarded-For")
-  }
+  override fun getPort(): Int = _port
 
-  private val httpHeaders = HttpHeaders(
-    http4KRequest.headers
-      .map { (name, value) -> CaseInsensitiveKey(name) to value!! }
-      .groupBy({ it.first }, { it.second })
-      .map { (name, values) -> HttpHeader(name, values) },
-  )
+  private val header = getHeader("X-Forwarded-For")
 
-  override fun getHeaders(): HttpHeaders = httpHeaders
+  override fun getClientIp(): String? = header
 
-  private val queryParams = splitQuery(http4KRequest.uri.query)
+  override fun getHeaders(): HttpHeaders = _httpHeaders
+
+  private val queryParams by lazy { splitQuery(http4KRequest.uri.query) }
 
   override fun queryParameter(key: String): QueryParameter {
     return queryParams[key] ?: QueryParameter.absent(key)
   }
 
-  private val formParameters = run {
+  private val formParameters by lazy {
     val contentTypeHeader = contentTypeHeader()
     if (contentTypeHeader.mimeTypePart()?.contains("application/x-www-form-urlencoded") != true) {
       emptyMap<String, FormParameter>()
@@ -109,18 +121,16 @@ class WireMockHttp4kRequestAdapter(
       .mapValues { (name, values) -> FormParameter(name, values) }
   }
 
-  override fun formParameters(): Map<String, FormParameter> {
-    return formParameters
+  override fun formParameters(): Map<String, FormParameter> = formParameters
+
+  private val _cookies by lazy {
+    http4KRequest.cookies()
+      .groupBy { it.name }
+      .map { (name, values) -> Cookie(name, values.map { it.value }) }
+      .associateBy { it.key }
   }
 
-  private val cookies = http4KRequest.cookies()
-    .groupBy { it.name }
-    .map { (name, values) -> Cookie(name, values.map { it.value }) }
-    .associateBy { it.key }
-
-  override fun getCookies(): Map<String, Cookie> {
-    return cookies
-  }
+  override fun getCookies(): Map<String, Cookie> = _cookies
 
   override fun getBody(): ByteArray = http4KRequest.body.payload.array()
 
@@ -143,9 +153,7 @@ class WireMockHttp4kRequestAdapter(
     return if (cachedMultiparts?.isEmpty() == false) cachedMultiparts else null
   }
 
-  override fun isBrowserProxyRequest(): Boolean {
-    return false
-  }
+  override fun isBrowserProxyRequest(): Boolean = false
 
   override fun getProtocol(): String = http4KRequest.version
 }

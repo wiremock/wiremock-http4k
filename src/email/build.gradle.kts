@@ -13,6 +13,9 @@ dependencies {
   testImplementation("org.wiremock:wiremock-standalone:3.0.4")
   testImplementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
 
+  testRuntimeOnly("org.slf4j:slf4j-api:2.0.9")
+  testRuntimeOnly("ch.qos.logback:logback-classic:1.4.11")
+
   modules {
     module("com.github.tomakehurst:wiremock-jre8-standalone") {
       replacedBy("org.wiremock:wiremock-standalone")

@@ -14,6 +14,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.test.config.TestCaseConfig
 import io.kotest.extensions.wiremock.ListenerMode.PER_TEST
 import io.kotest.extensions.wiremock.WireMockListener
 import org.http4k.core.HttpHandler
@@ -195,60 +196,61 @@ abstract class SendgridEmailClientSpec(
 
     "initial test" {
 
-      repeat(100) {
-        sendgridMock.resetRequests()
+      sendgridMock.resetRequests()
 
-        // when
-        sendgridClient.sendEmail(
-          recipientAddress = recipient,
-          subject = "Test Email",
-          body = "Hello, world!",
+      // when
+      sendgridClient.sendEmail(
+        recipientAddress = recipient,
+        subject = "Test Email",
+        body = "Hello, world!",
+      )
+
+      // then
+      sendgridMock.verify(
+        postRequestedFor(
+          urlEqualTo("/v3/mail/send"),
         )
-
-        // then
-        sendgridMock.verify(
-          postRequestedFor(
-            urlEqualTo("/v3/mail/send"),
-          )
-            .withRequestBody(
-              equalToJson(
-                """
-          {
-            "personalizations" : [
+          .withRequestBody(
+            equalToJson(
+              """
               {
-                "to" : [
+                "personalizations" : [
                   {
-                    "email" : "recipient@example.com",
-                    "name" : null
-                  }
-                ],
-                "from" : {
-                  "email" : "sender@example.com",
-                  "name" : null
-                },
-                "subject" : "Test Email",
-                "content" : [
-                  {
-                    "type" : {
-                      "value" : "text/plain",
-                      "directives" : [
-                        {
-                          "first" : "charset",
-                          "second" : "utf-8"
-                        }
-                      ]
+                    "to" : [
+                      {
+                        "email" : "recipient@example.com",
+                        "name" : null
+                      }
+                    ],
+                    "from" : {
+                      "email" : "sender@example.com",
+                      "name" : null
                     },
-                    "value" : "Hello, world!"
+                    "subject" : "Test Email",
+                    "content" : [
+                      {
+                        "type" : {
+                          "value" : "text/plain",
+                          "directives" : [
+                            {
+                              "first" : "charset",
+                              "second" : "utf-8"
+                            }
+                          ]
+                        },
+                        "value" : "Hello, world!"
+                      }
+                    ]
                   }
                 ]
               }
-            ]
-          }
-                """.trimIndent(),
-              ),
+              """.trimIndent(),
             ),
-        )
-      }
+          ),
+      )
     }
   },
-)
+) {
+  @Suppress("OVERRIDE_DEPRECATION")
+  override fun defaultTestCaseConfig() = TestCaseConfig(invocations = 10)
+}

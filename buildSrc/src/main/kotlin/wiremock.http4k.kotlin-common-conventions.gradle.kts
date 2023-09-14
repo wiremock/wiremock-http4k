@@ -8,16 +8,9 @@ repositories {
   mavenCentral()
 }
 
-
-
 configure<JavaPluginExtension> {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(17))
-  }
-
-  @Suppress("UnstableApiUsage")
-  consistentResolution {
-    useCompileClasspathVersions()
   }
 }
 

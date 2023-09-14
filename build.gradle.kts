@@ -15,7 +15,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    "classpath"(group = "com.github.gundy", name = "semver4j", version = "0.16.4")
+    classpath(group = "com.github.gundy", name = "semver4j", version = "0.16.4")
   }
 }
 

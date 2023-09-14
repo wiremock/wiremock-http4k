@@ -13,26 +13,24 @@ import com.github.tomakehurst.wiremock.client.WireMock.not
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.wiremock.ListenerMode.PER_TEST
 import io.kotest.extensions.wiremock.WireMockListener
-import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler
-import org.http4k.core.Uri
 import org.intellij.lang.annotations.Language
 import java.util.UUID.randomUUID
 
 @Language("RegExp")
 private const val emailRegex = """[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+"""
 
-class SendgridEmailClientSpec : StringSpec({
+abstract class SendgridEmailClientSpec(
+  private val client: HttpHandler,
+  private val sendgridMock: WireMockServer,
+) : StringSpec({
 
-  val client: HttpHandler = ApacheClient()
   val sender: EmailAddress = "sender@example.com".toEmailAddress()
   val recipient: EmailAddress = "recipient@example.com".toEmailAddress()
   val apiKey: ApiKey = randomUUID().toString().toApiKey()
-  val sendgridMock: WireMockServer = WireMockServer(options().dynamicPort())
 
   listener(WireMockListener(sendgridMock, PER_TEST))
 
@@ -179,7 +177,7 @@ class SendgridEmailClientSpec : StringSpec({
     )
 
     sendgridClient = SendgridEmailClient(
-      client = UriSettingHttpHandler(sendgridMock.baseUrl().toUri(), client),
+      client = client,
       apiKey = apiKey,
       from = sender
     )
@@ -247,5 +245,3 @@ class SendgridEmailClientSpec : StringSpec({
     )
   }
 })
-
-private fun String.toUri() = Uri.of(this)

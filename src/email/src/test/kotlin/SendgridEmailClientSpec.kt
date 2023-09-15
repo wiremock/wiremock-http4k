@@ -60,28 +60,9 @@ abstract class SendgridEmailClientSpec(
                 {
                   "type": "object",
                   "properties": {
-                    "emails": {
-                      "type": "array",
-                      "items": { 
-                        "type": "object",
-                        "properties": {
-                          "to": { "type": "array", "items": { "${'$'}ref": "#/schemas/address" } },
-                          "from": { "type": "object", "${'$'}ref": "#/schemas/address" },
-                          "subject": { "type": "string" }
-                        },
-                        "required": [ "from", "subject" ]
-                      }
-                    }  
-                  },
-                  "required": [ "emails" ],
-                  "schemas": {
-                    "address": {
-                      "type": "object",
-                      "properties": {
-                        "email": { "type": "string", "format": "email" }
-                      },
-                      "required": [ "email" ]
-                    }
+                    "to": { "type": "string", "format": "email" },
+                    "from": { "type": "string", "format": "email" },
+                    "subject": { "type": "string" }
                   }
                 }
                 """.trimIndent(),
@@ -136,37 +117,12 @@ abstract class SendgridEmailClientSpec(
           .withRequestBody(
             equalToJson(
               """
-            {
-              "emails" : [
                 {
-                  "to" : [
-                    {
-                      "email" : "recipient@example.com",
-                      "name" : null
-                    }
-                  ],
-                  "from" : {
-                    "email" : "sender@example.com",
-                    "name" : null
-                  },
+                  "to" : "recipient@example.com",
+                  "from" : "sender@example.com",
                   "subject" : "Test Email",
-                  "content" : [
-                    {
-                      "type" : {
-                        "value" : "text/plain",
-                        "directives" : [
-                          {
-                            "first" : "charset",
-                            "second" : "utf-8"
-                          }
-                        ]
-                      },
-                      "value" : "Hello, world!"
-                    }
-                  ]
+                  "content" : "Hello, world!"
                 }
-              ]
-            }
               """.trimIndent(),
             ),
           ),

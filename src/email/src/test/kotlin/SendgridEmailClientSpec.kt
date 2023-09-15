@@ -59,7 +59,7 @@ abstract class SendgridEmailClientSpec(
                 {
                   "type": "object",
                   "properties": {
-                    "personalizations": {
+                    "emails": {
                       "type": "array",
                       "items": { 
                         "type": "object",
@@ -72,7 +72,7 @@ abstract class SendgridEmailClientSpec(
                       }
                     }  
                   },
-                  "required": [ "personalizations" ],
+                  "required": [ "emails" ],
                   "schemas": {
                     "address": {
                       "type": "object",
@@ -135,7 +135,7 @@ abstract class SendgridEmailClientSpec(
             equalToJson(
               """
             {
-              "personalizations" : [
+              "emails" : [
                 {
                   "to" : [
                     {

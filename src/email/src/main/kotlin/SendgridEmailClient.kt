@@ -7,9 +7,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.format.Jackson
-import wiremock.http4k.email.Payload.Personalization
-import wiremock.http4k.email.Payload.Personalization.AddressAndName
-import wiremock.http4k.email.Payload.Personalization.Content
+import wiremock.http4k.email.Emails.Email
+import wiremock.http4k.email.Emails.Email.AddressAndName
+import wiremock.http4k.email.Emails.Email.Content
 
 class SendgridEmailClient(
   private val client: HttpHandler,
@@ -23,8 +23,8 @@ class SendgridEmailClient(
     body: String,
   ) {
 
-    val payload = Payload(
-      Personalization(
+    val emails = Emails(
+      Email(
         to = AddressAndName(recipientAddress),
         from = AddressAndName(from),
         subject = subject,
@@ -32,7 +32,7 @@ class SendgridEmailClient(
       )
     )
 
-    val body1 = payload.toJson()
+    val body1 = emails.toJson()
     val request = Request(
       method = POST,
       uri = "/v3/mail/send",
@@ -59,13 +59,13 @@ value class ApiKey(private val value: String) {
 
 fun String.toApiKey() = ApiKey(this)
 
-data class Payload(
-  val personalizations: List<Personalization>,
+data class Emails(
+  val emails: List<Email>,
 ) {
 
-  constructor(vararg personalizations: Personalization) : this(personalizations.toList())
+  constructor(vararg emails: Email) : this(emails.toList())
 
-  data class Personalization(
+  data class Email(
     val to: List<AddressAndName>,
     val from: AddressAndName,
     val subject: String,

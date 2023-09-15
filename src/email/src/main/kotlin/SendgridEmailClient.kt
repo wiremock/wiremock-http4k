@@ -6,6 +6,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.format.Jackson
 import wiremock.http4k.email.Emails.Email
 import wiremock.http4k.email.Emails.Email.AddressAndName
@@ -13,6 +14,7 @@ import wiremock.http4k.email.Emails.Email.Content
 
 class SendgridEmailClient(
   private val client: HttpHandler,
+  private val baseUrl: Uri,
   private val apiKey: ApiKey,
   private val from: EmailAddress,
 ) : EmailClient {
@@ -35,7 +37,7 @@ class SendgridEmailClient(
     val body1 = emails.toJson()
     val request = Request(
       method = POST,
-      uri = "/v3/mail/send",
+      uri = baseUrl.path("/v3/mail/send"),
     )
       .header("Authorization", "Bearer $apiKey")
       .header("Content-Type", APPLICATION_JSON.toHeaderValue())

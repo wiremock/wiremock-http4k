@@ -18,6 +18,7 @@ import io.kotest.extensions.wiremock.ListenerMode.PER_TEST
 import io.kotest.extensions.wiremock.WireMockListener
 import io.kotest.matchers.shouldBe
 import org.http4k.core.HttpHandler
+import wiremock.http4k.email.http4k.toUri
 import java.util.UUID.randomUUID
 
 abstract class SendgridEmailClientSpec(
@@ -115,8 +116,9 @@ abstract class SendgridEmailClientSpec(
 
       val sendgridClient = SendgridEmailClient(
         client = client,
+        baseUrl = sendgridMock.baseUrl().toUri(),
         apiKey = validApiKey,
-        from = sender
+        from = sender,
       )
 
       // when
@@ -176,8 +178,9 @@ abstract class SendgridEmailClientSpec(
       // given
       val sendgridClient = SendgridEmailClient(
         client = client,
+        baseUrl = sendgridMock.baseUrl().toUri(),
         apiKey = "invalid API Key".toApiKey(),
-        from = "sender@example.com".toEmailAddress()
+        from = "sender@example.com".toEmailAddress(),
       )
 
       // when
@@ -199,8 +202,9 @@ abstract class SendgridEmailClientSpec(
       // given
       val sendgridClient = SendgridEmailClient(
         client = client,
+        baseUrl = sendgridMock.baseUrl().toUri(),
         apiKey = validApiKey,
-        from = "sender@example.com".toEmailAddress()
+        from = "sender@example.com".toEmailAddress(),
       )
 
       // when

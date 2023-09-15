@@ -14,7 +14,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.core.test.config.TestCaseConfig
 import io.kotest.extensions.wiremock.ListenerMode.PER_TEST
 import io.kotest.extensions.wiremock.WireMockListener
 import io.kotest.matchers.shouldBe
@@ -224,7 +223,4 @@ abstract class SendgridEmailClientSpec(
       sendgridMock.resetRequests()
     }
   },
-) {
-  @Suppress("OVERRIDE_DEPRECATION")
-  override fun defaultTestCaseConfig() = TestCaseConfig(invocations = 10)
-}
+)

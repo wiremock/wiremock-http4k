@@ -1,4 +1,4 @@
-package wiremock.http4k.email.wiremock
+package wiremock.http4k.wiremock
 
 import com.github.tomakehurst.wiremock.http.ContentTypeHeader
 import com.github.tomakehurst.wiremock.http.FormParameter

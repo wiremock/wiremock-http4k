@@ -8,6 +8,13 @@ dependencies {
   implementation(platform("org.http4k:http4k-bom:5.8.0.0"))
   implementation("org.http4k:http4k-format-jackson")
 
+  testImplementation("io.kotest:kotest-runner-junit5")
+  testImplementation("io.kotest:kotest-framework-api")
+  testImplementation("io.kotest:kotest-common")
+  testImplementation("io.kotest:kotest-assertions-shared")
+
+  testImplementation(project(":http4k-ext"))
+  testImplementation(project(":wiremock-http4k"))
   testImplementation("org.http4k:http4k-client-apache")
   testImplementation("io.kotest.extensions:kotest-extensions-wiremock:2.0.1")
   testImplementation("org.wiremock:wiremock-standalone:3.0.4")

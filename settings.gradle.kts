@@ -13,6 +13,9 @@ rootProject.name = "wiremock-http4k"
 
 createProject("src/app", ":app")
 createProject("src/email", ":email")
+createProject("src/http4k-ext", ":http4k-ext")
+createProject("src/wiremock-ext", ":wiremock-ext")
+createProject("src/wiremock-http4k", ":wiremock-http4k")
 
 fun Settings.createProject(projectDir: String, projectName: String) {
   include(projectName)

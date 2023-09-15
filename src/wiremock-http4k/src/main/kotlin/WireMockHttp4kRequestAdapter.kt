@@ -1,4 +1,4 @@
-package wiremock.http4k.email.wiremock.http4k
+package wiremock.http4k.wiremock.http4k
 
 import com.github.tomakehurst.wiremock.common.Urls.splitQuery
 import com.github.tomakehurst.wiremock.http.CaseInsensitiveKey
@@ -14,7 +14,7 @@ import org.http4k.appendIfNotBlank
 import org.http4k.core.Method
 import org.http4k.core.cookie.cookies
 import wiremock.http4k.email.http4k.isAbsolute
-import wiremock.http4k.email.wiremock.WireMockRequestBase
+import wiremock.http4k.wiremock.WireMockRequestBase
 import wiremock.org.eclipse.jetty.util.MultiMap
 import wiremock.org.eclipse.jetty.util.UrlEncoded
 import com.github.tomakehurst.wiremock.http.Request as WireMockRequest

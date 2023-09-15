@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import com.github.tomakehurst.wiremock.direct.DirectCallHttpServerFactory
 import org.http4k.core.HttpHandler
-import wiremock.http4k.email.wiremock.http4k.toHttp4kResponse
-import wiremock.http4k.email.wiremock.http4k.toWireMockRequest
+import wiremock.http4k.wiremock.http4k.toHttp4kResponse
+import wiremock.http4k.wiremock.http4k.toWireMockRequest
 import org.http4k.core.Request as Http4KRequest
 
 private val serverFactory = DirectCallHttpServerFactory()

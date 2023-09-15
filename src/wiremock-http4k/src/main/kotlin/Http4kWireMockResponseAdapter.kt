@@ -1,4 +1,4 @@
-package wiremock.http4k.email.wiremock.http4k
+package wiremock.http4k.wiremock.http4k
 
 import org.http4k.core.MemoryBody
 import org.http4k.core.MemoryResponse

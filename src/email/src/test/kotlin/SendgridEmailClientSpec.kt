@@ -7,22 +7,19 @@ import com.github.tomakehurst.wiremock.client.WireMock.anyUrl
 import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
-import com.github.tomakehurst.wiremock.client.WireMock.matching
-import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
+import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonSchema
 import com.github.tomakehurst.wiremock.client.WireMock.not
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.config.TestCaseConfig
 import io.kotest.extensions.wiremock.ListenerMode.PER_TEST
 import io.kotest.extensions.wiremock.WireMockListener
+import io.kotest.matchers.shouldBe
 import org.http4k.core.HttpHandler
-import org.intellij.lang.annotations.Language
 import java.util.UUID.randomUUID
-
-@Language("RegExp")
-private const val emailRegex = """[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+"""
 
 abstract class SendgridEmailClientSpec(
   private val client: HttpHandler,
@@ -30,158 +27,75 @@ abstract class SendgridEmailClientSpec(
 ) : StringSpec(
   {
 
-    val sender: EmailAddress = "sender@example.com".toEmailAddress()
-    val recipient: EmailAddress = "recipient@example.com".toEmailAddress()
-    val apiKey: ApiKey = randomUUID().toString().toApiKey()
+    val validApiKey: ApiKey = randomUUID().toString().toApiKey()
 
-    listener(WireMockListener(sendgridMock, PER_TEST))
-
-    lateinit var sendgridClient: SendgridEmailClient
-
-    beforeTest {
-
-      sendgridMock.givenThat(
-        post("/v3/mail/send")
-          .withRequestBody(
-            not(
-              matchingJsonPath("$.personalizations[0].from.email", matching(emailRegex))
-            )
-          )
-          .willReturn(
-            aResponse()
-              .withStatus(400)
-              .withBody(
-                """
-              { 
-                "error": {
-                  "type": "invalid_email",
-                  "field": "${'$'}.personalizations[0].from.email"
-                }
-              }
-                """.trimIndent()
-              )
-          )
-          .atPriority(4)
-      )
-
-      sendgridMock.givenThat(
-        post("/v3/mail/send")
-          .withRequestBody(
-            not(
-              matchingJsonPath("$.personalizations[0].to[0].email", matching(emailRegex))
-            )
-          )
-          .willReturn(
-            aResponse()
-              .withStatus(400)
-              .withBody(
-                """
-              { 
-                "error": {
-                  "type": "invalid_email",
-                  "field": "${'$'}.personalizations[0].to[0].email"
-                }
-              }
-                """.trimIndent()
-              )
-          )
-          .atPriority(4)
-      )
-
-      sendgridMock.givenThat(
-        post("/v3/mail/send")
-          .withRequestBody(
-            not(
-              matchingJsonPath("$.personalizations[0].subject")
-            )
-          )
-          .willReturn(
-            aResponse()
-              .withStatus(400)
-              .withBody(
-                """
-              { 
-                "error": {
-                  "type": "missing_field",
-                  "field": "${'$'}.personalizations[0].subject"
-                }
-              }
-                """.trimIndent()
-              )
-          )
-          .atPriority(4)
-      )
-
-      sendgridMock.givenThat(
-        post("/v3/mail/send")
-          .withRequestBody(
-            not(
-              matchingJsonPath("$.personalizations[0].content[0].type")
-            )
-          )
-          .willReturn(
-            aResponse()
-              .withStatus(400)
-              .withBody(
-                """
-              { 
-                "error": {
-                  "type": "missing_field",
-                  "field": "${'$'}.personalizations[0].content[0].type"
-                }
-              }
-                """.trimIndent()
-              )
-          )
-          .atPriority(4)
-      )
-
-      sendgridMock.givenThat(
-        post("/v3/mail/send")
-          .withRequestBody(
-            not(
-              matchingJsonPath("$.personalizations[0].content[0].value")
-            )
-          )
-          .willReturn(
-            aResponse()
-              .withStatus(400)
-              .withBody(
-                """
-              { 
-                "error": {
-                  "type": "missing_field",
-                  "field": "${'$'}.personalizations[0].content[0].value"
-                }
-              }
-                """.trimIndent()
-              )
-          )
-          .atPriority(4)
-      )
+    beforeSpec {
 
       sendgridMock.givenThat(
         any(anyUrl())
-          .withHeader("Authorization", not(equalTo("Bearer $apiKey")))
+          .withHeader("Authorization", not(equalTo("Bearer $validApiKey")))
           .willReturn(
-            aResponse().withStatus(403)
+            aResponse().withStatus(401)
+              .withBody("""{ "error":  "no token or invalid token" }""")
           )
-          .atPriority(4)
+          .atPriority(2)
       )
 
       sendgridMock.givenThat(
-        any(anyUrl())
+        post(anyUrl())
           .withHeader("Content-Type", not(containing("application/json")))
           .willReturn(
             aResponse().withStatus(400)
+              .withBody("""{ "error":  "only application/json accepted" }""")
           )
-          .atPriority(4)
+          .atPriority(3)
       )
 
-      sendgridClient = SendgridEmailClient(
-        client = client,
-        apiKey = apiKey,
-        from = sender
+      sendgridMock.givenThat(
+        post("/v3/mail/send")
+          .withRequestBody(
+            not(
+              matchingJsonSchema(
+                """
+                {
+                  "type": "object",
+                  "properties": {
+                    "personalizations": {
+                      "type": "array",
+                      "items": { 
+                        "type": "object",
+                        "properties": {
+                          "to": { "type": "array", "items": { "${'$'}ref": "#/schemas/address" } },
+                          "from": { "type": "object", "${'$'}ref": "#/schemas/address" },
+                          "subject": { "type": "string" }
+                        },
+                        "required": [ "from", "subject" ]
+                      }
+                    }  
+                  },
+                  "required": [ "personalizations" ],
+                  "schemas": {
+                    "address": {
+                      "type": "object",
+                      "properties": {
+                        "email": { "type": "string", "format": "email" }
+                      },
+                      "required": [ "email" ]
+                    }
+                  }
+                }
+                """.trimIndent(),
+              ),
+            ),
+          )
+          .willReturn(
+            aResponse()
+              .withStatus(400)
+              .withBody(
+                """{ "error": "invalid_request_format" }"""
+              )
+          )
+          .atPriority(4),
       )
 
       sendgridMock.givenThat(
@@ -194,9 +108,17 @@ abstract class SendgridEmailClientSpec(
       )
     }
 
-    "initial test" {
+    "successfully sends valid email" {
 
-      sendgridMock.resetRequests()
+      // given
+      val sender: EmailAddress = "sender@example.com".toEmailAddress()
+      val recipient: EmailAddress = "recipient@example.com".toEmailAddress()
+
+      val sendgridClient = SendgridEmailClient(
+        client = client,
+        apiKey = validApiKey,
+        from = sender
+      )
 
       // when
       sendgridClient.sendEmail(
@@ -213,41 +135,93 @@ abstract class SendgridEmailClientSpec(
           .withRequestBody(
             equalToJson(
               """
-              {
-                "personalizations" : [
-                  {
-                    "to" : [
-                      {
-                        "email" : "recipient@example.com",
-                        "name" : null
-                      }
-                    ],
-                    "from" : {
-                      "email" : "sender@example.com",
+            {
+              "personalizations" : [
+                {
+                  "to" : [
+                    {
+                      "email" : "recipient@example.com",
                       "name" : null
-                    },
-                    "subject" : "Test Email",
-                    "content" : [
-                      {
-                        "type" : {
-                          "value" : "text/plain",
-                          "directives" : [
-                            {
-                              "first" : "charset",
-                              "second" : "utf-8"
-                            }
-                          ]
-                        },
-                        "value" : "Hello, world!"
-                      }
-                    ]
-                  }
-                ]
-              }
+                    }
+                  ],
+                  "from" : {
+                    "email" : "sender@example.com",
+                    "name" : null
+                  },
+                  "subject" : "Test Email",
+                  "content" : [
+                    {
+                      "type" : {
+                        "value" : "text/plain",
+                        "directives" : [
+                          {
+                            "first" : "charset",
+                            "second" : "utf-8"
+                          }
+                        ]
+                      },
+                      "value" : "Hello, world!"
+                    }
+                  ]
+                }
+              ]
+            }
               """.trimIndent(),
             ),
           ),
       )
+    }
+
+    "rejects invalid api key" {
+
+      // given
+      val sendgridClient = SendgridEmailClient(
+        client = client,
+        apiKey = "invalid API Key".toApiKey(),
+        from = "sender@example.com".toEmailAddress()
+      )
+
+      // when
+      val e = shouldThrow<IllegalArgumentException> {
+        sendgridClient.sendEmail(
+          recipientAddress = "recipient@example.com".toEmailAddress(),
+          subject = "Test Email",
+          body = "Hello, world!",
+        )
+      }
+
+      // then
+      e.message shouldBe
+        """Got [401 Unauthorized] with body [{ "error":  "no token or invalid token" }]"""
+    }
+
+    "rejects invalid email address" {
+
+      // given
+      val sendgridClient = SendgridEmailClient(
+        client = client,
+        apiKey = validApiKey,
+        from = "sender@example.com".toEmailAddress()
+      )
+
+      // when
+      val e = shouldThrow<IllegalArgumentException> {
+        sendgridClient.sendEmail(
+          recipientAddress = "Not An Email Address".toEmailAddress(),
+          subject = "Test Email",
+          body = "Hello, world!",
+        )
+      }
+
+      // then
+      e.message shouldBe
+        """Got [400 Bad Request] with body [{ "error": "invalid_request_format" }]"""
+    }
+
+    listener(WireMockListener(sendgridMock, PER_TEST))
+
+    beforeTest {
+      sendgridMock.resetRequests()
     }
   },
 ) {

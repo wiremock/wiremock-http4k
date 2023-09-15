@@ -12,7 +12,8 @@ dependencies {
   testImplementation(platform("io.kotest:kotest-bom:$kotestVersion"))
   testImplementation("io.kotest:kotest-runner-junit5")
   testImplementation("io.kotest:kotest-framework-api")
-//  testImplementation("io.kotest:kotest-assertions-shared")
+  testImplementation("io.kotest:kotest-common")
+  testImplementation("io.kotest:kotest-assertions-shared")
 
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

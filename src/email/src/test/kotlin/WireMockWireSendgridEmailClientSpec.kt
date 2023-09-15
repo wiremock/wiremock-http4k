@@ -6,7 +6,7 @@ import org.http4k.client.ApacheClient
 import wiremock.http4k.email.http4k.UriSettingHttpHandler
 import wiremock.http4k.email.http4k.toUri
 
-val sendgridMock = WireMockServer(options().dynamicPort())
+private val sendgridMock = WireMockServer(options().dynamicPort())
 
 class WireMockWireSendgridEmailClientSpec : SendgridEmailClientSpec(
   UriSettingHttpHandler(

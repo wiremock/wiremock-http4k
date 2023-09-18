@@ -14,7 +14,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.extensions.wiremock.ListenerMode.PER_TEST
+import io.kotest.extensions.wiremock.ListenerMode.PER_SPEC
 import io.kotest.extensions.wiremock.WireMockListener
 import io.kotest.matchers.shouldBe
 import org.http4k.core.HttpHandler
@@ -177,7 +177,7 @@ abstract class SendgridEmailClientSpec(
         """Got [400 Bad Request] with body [{ "error": "invalid_request_format" }]"""
     }
 
-    listener(WireMockListener(sendgridMock, PER_TEST))
+    listener(WireMockListener(sendgridMock, PER_SPEC))
 
     beforeTest {
       sendgridMock.resetRequests()

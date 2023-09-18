@@ -21,9 +21,9 @@ import org.http4k.core.HttpHandler
 import wiremock.http4k.email.http4k.toUri
 import java.util.UUID.randomUUID
 
-abstract class SendgridEmailClientSpec(
+abstract class MyFirstEmailClientSpec(
   private val client: HttpHandler,
-  private val sendgridMock: WireMockServer,
+  private val emailServerMock: WireMockServer,
 ) : StringSpec(
   {
 
@@ -31,7 +31,7 @@ abstract class SendgridEmailClientSpec(
 
     beforeSpec {
 
-      sendgridMock.givenThat(
+      emailServerMock.givenThat(
         any(anyUrl())
           .withHeader("Authorization", not(equalTo("Bearer $validApiKey")))
           .willReturn(
@@ -41,7 +41,7 @@ abstract class SendgridEmailClientSpec(
           .atPriority(2)
       )
 
-      sendgridMock.givenThat(
+      emailServerMock.givenThat(
         post(anyUrl())
           .withHeader("Content-Type", not(containing("application/json")))
           .willReturn(
@@ -51,7 +51,7 @@ abstract class SendgridEmailClientSpec(
           .atPriority(3)
       )
 
-      sendgridMock.givenThat(
+      emailServerMock.givenThat(
         post("/v3/mail/send")
           .withRequestBody(
             not(
@@ -79,7 +79,7 @@ abstract class SendgridEmailClientSpec(
           .atPriority(4),
       )
 
-      sendgridMock.givenThat(
+      emailServerMock.givenThat(
         post("/v3/mail/send")
           .willReturn(
             aResponse()
@@ -95,22 +95,22 @@ abstract class SendgridEmailClientSpec(
       val sender: EmailAddress = "sender@example.com".toEmailAddress()
       val recipient: EmailAddress = "recipient@example.com".toEmailAddress()
 
-      val sendgridClient = SendgridEmailClient(
+      val emailClient = MyFirstEmailClient(
         client = client,
-        baseUrl = sendgridMock.baseUrl().toUri(),
+        baseUrl = emailServerMock.baseUrl().toUri(),
         apiKey = validApiKey,
         from = sender,
       )
 
       // when
-      sendgridClient.sendEmail(
+      emailClient.sendEmail(
         recipientAddress = recipient,
         subject = "Test Email",
         body = "Hello, world!",
       )
 
       // then
-      sendgridMock.verify(
+      emailServerMock.verify(
         postRequestedFor(
           urlEqualTo("/v3/mail/send"),
         )
@@ -132,16 +132,16 @@ abstract class SendgridEmailClientSpec(
     "rejects invalid api key" {
 
       // given
-      val sendgridClient = SendgridEmailClient(
+      val emailClient = MyFirstEmailClient(
         client = client,
-        baseUrl = sendgridMock.baseUrl().toUri(),
+        baseUrl = emailServerMock.baseUrl().toUri(),
         apiKey = "invalid API Key".toApiKey(),
         from = "sender@example.com".toEmailAddress(),
       )
 
       // when
       val e = shouldThrow<IllegalArgumentException> {
-        sendgridClient.sendEmail(
+        emailClient.sendEmail(
           recipientAddress = "recipient@example.com".toEmailAddress(),
           subject = "Test Email",
           body = "Hello, world!",
@@ -156,16 +156,16 @@ abstract class SendgridEmailClientSpec(
     "rejects invalid email address" {
 
       // given
-      val sendgridClient = SendgridEmailClient(
+      val emailClient = MyFirstEmailClient(
         client = client,
-        baseUrl = sendgridMock.baseUrl().toUri(),
+        baseUrl = emailServerMock.baseUrl().toUri(),
         apiKey = validApiKey,
         from = "sender@example.com".toEmailAddress(),
       )
 
       // when
       val e = shouldThrow<IllegalArgumentException> {
-        sendgridClient.sendEmail(
+        emailClient.sendEmail(
           recipientAddress = "Not An Email Address".toEmailAddress(),
           subject = "Test Email",
           body = "Hello, world!",
@@ -177,10 +177,10 @@ abstract class SendgridEmailClientSpec(
         """Got [400 Bad Request] with body [{ "error": "invalid_request_format" }]"""
     }
 
-    listener(WireMockListener(sendgridMock, PER_SPEC))
+    listener(WireMockListener(emailServerMock, PER_SPEC))
 
     beforeTest {
-      sendgridMock.resetRequests()
+      emailServerMock.resetRequests()
     }
   },
 )

@@ -7,7 +7,7 @@ import wiremock.http4k.wiremock.http4k.toHttp4kHandler
 
 private val serverFactory = DirectCallHttpServerFactory()
 
-class WireMockInMemorySendgridEmailClientSpec : SendgridEmailClientSpec(
+class WireMockInMemoryMyFirstEmailClientSpec : MyFirstEmailClientSpec(
   client = serverFactory.toHttp4kHandler(),
-  sendgridMock = WireMockServer(options().httpServerFactory(serverFactory)),
+  emailServerMock = WireMockServer(options().httpServerFactory(serverFactory)),
 )

@@ -8,7 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.format.Jackson
 
-class SendgridEmailClient(
+class MyFirstEmailClient(
   private val client: HttpHandler,
   private val baseUrl: Uri,
   private val apiKey: ApiKey,

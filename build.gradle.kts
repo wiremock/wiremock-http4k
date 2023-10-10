@@ -5,9 +5,9 @@ plugins {
   base
   kotlin("jvm") apply false
   id("org.jmailen.kotlinter")
-  id("com.autonomousapps.dependency-analysis") version "1.21.0"
+  id("com.autonomousapps.dependency-analysis") version "1.25.0"
   id("com.dorongold.task-tree") version "2.1.1"
-  id("com.github.ben-manes.versions") version "0.48.0"
+  id("com.github.ben-manes.versions") version "0.49.0"
 }
 
 buildscript {

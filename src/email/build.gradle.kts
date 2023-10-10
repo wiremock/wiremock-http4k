@@ -5,7 +5,7 @@ plugins {
 dependencies {
   api("org.http4k:http4k-core")
 
-  implementation(platform("org.http4k:http4k-bom:5.8.0.0"))
+  implementation(platform("org.http4k:http4k-bom:5.8.4.0"))
   implementation("org.http4k:http4k-format-jackson")
 
   testImplementation("io.kotest:kotest-runner-junit5")
@@ -17,7 +17,7 @@ dependencies {
   testImplementation(project(":wiremock-http4k"))
   testImplementation("org.http4k:http4k-client-apache")
   testImplementation("io.kotest.extensions:kotest-extensions-wiremock:2.0.1")
-  testImplementation("org.wiremock:wiremock-standalone:3.0.4")
+  testImplementation("org.wiremock:wiremock-standalone:3.2.0")
   testImplementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
 
   testRuntimeOnly("org.slf4j:slf4j-api:2.0.9")

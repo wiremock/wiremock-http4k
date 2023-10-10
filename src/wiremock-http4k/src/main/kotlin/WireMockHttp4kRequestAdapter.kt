@@ -24,13 +24,12 @@ class WireMockHttp4kRequestAdapter(
   private val http4KRequest: Http4kRequest,
 ) : WireMockRequestBase {
 
-  private val _httpHeaders =
-    HttpHeaders(
-      http4KRequest.headers
-        .map { (name, value) -> CaseInsensitiveKey(name) to value!! }
-        .groupBy({ it.first }, { it.second })
-        .map { (name, values) -> HttpHeader(name, values) },
-    )
+  private val httpHeaders = HttpHeaders(
+    http4KRequest.headers
+      .map { (name, value) -> CaseInsensitiveKey(name) to value!! }
+      .groupBy({ it.first }, { it.second })
+      .map { (name, values) -> HttpHeader(name, values) },
+  )
 
   private val url = StringBuilder()
     .append(
@@ -63,7 +62,7 @@ class WireMockHttp4kRequestAdapter(
     Method.TRACE -> RequestMethod.TRACE
     Method.PATCH -> RequestMethod.PATCH
     Method.PURGE -> throw UnsupportedOperationException(
-      "HTTP method PURGE is not supported in WireMock"
+      "HTTP method PURGE is not supported in WireMock",
     )
 
     Method.HEAD -> RequestMethod.HEAD
@@ -86,7 +85,7 @@ class WireMockHttp4kRequestAdapter(
 
   override fun getHost(): String? = host
 
-  private val _port by lazy {
+  private val portField by lazy {
     val hostHeader = header("Host")
     if (hostHeader.isPresent && hostHeader.firstValue().contains(":")) {
       hostHeader.firstValue().substringAfter(':').toInt()
@@ -95,13 +94,13 @@ class WireMockHttp4kRequestAdapter(
     }
   }
 
-  override fun getPort(): Int = _port
+  override fun getPort(): Int = portField
 
   private val header = getHeader("X-Forwarded-For")
 
   override fun getClientIp(): String? = header
 
-  override fun getHeaders(): HttpHeaders = _httpHeaders
+  override fun getHeaders(): HttpHeaders = httpHeaders
 
   private val queryParams by lazy { splitQuery(http4KRequest.uri.query) }
 
@@ -123,14 +122,14 @@ class WireMockHttp4kRequestAdapter(
 
   override fun formParameters(): Map<String, FormParameter> = formParameters
 
-  private val _cookies by lazy {
+  private val delegateCookies by lazy {
     http4KRequest.cookies()
       .groupBy { it.name }
       .map { (name, values) -> Cookie(name, values.map { it.value }) }
       .associateBy { it.key }
   }
 
-  override fun getCookies(): Map<String, Cookie> = _cookies
+  override fun getCookies(): Map<String, Cookie> = delegateCookies
 
   override fun getBody(): ByteArray = http4KRequest.body.payload.array()
 

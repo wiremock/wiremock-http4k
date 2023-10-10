@@ -4,10 +4,10 @@ plugins {
 
 dependencies {
 
-  implementation(platform("org.http4k:http4k-bom:5.8.0.0"))
+  implementation(platform("org.http4k:http4k-bom:5.8.4.0"))
 
   api("org.http4k:http4k-core")
-  api("org.wiremock:wiremock-standalone:3.0.4")
+  api("org.wiremock:wiremock-standalone:3.2.0")
   api(project(":wiremock-ext"))
   implementation(project(":http4k-ext"))
 

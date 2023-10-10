@@ -14,5 +14,5 @@ repositories {
 
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
-  implementation("org.jmailen.kotlinter:org.jmailen.kotlinter.gradle.plugin:3.16.0")
+  implementation("org.jmailen.kotlinter:org.jmailen.kotlinter.gradle.plugin:4.0.0")
 }

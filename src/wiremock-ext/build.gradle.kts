@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-  api("org.wiremock:wiremock-standalone:3.0.4")
+  api("org.wiremock:wiremock-standalone:3.2.0")
 }

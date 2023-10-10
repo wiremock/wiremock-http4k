@@ -14,5 +14,6 @@ fun WireMockResponse.toHttp4kResponse(): Http4kResponse = MemoryResponse(
     }
   },
   body = MemoryBody(body),
-  version = "HTTP/1.1" // protocol is private in wiremock.http.Response
+  // protocol is private in wiremock.http.Response
+  version = "HTTP/1.1",
 )

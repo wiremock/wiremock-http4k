@@ -24,8 +24,7 @@ import java.util.UUID.randomUUID
 abstract class MyFirstEmailClientSpec(
   private val client: HttpHandler,
   private val emailServerMock: WireMockServer,
-) : StringSpec(
-  {
+) : StringSpec({
 
     val validApiKey: ApiKey = randomUUID().toString().toApiKey()
 
@@ -36,9 +35,9 @@ abstract class MyFirstEmailClientSpec(
           .withHeader("Authorization", not(equalTo("Bearer $validApiKey")))
           .willReturn(
             aResponse().withStatus(401)
-              .withBody("""{ "error":  "no token or invalid token" }""")
+              .withBody("""{ "error":  "no token or invalid token" }"""),
           )
-          .atPriority(2)
+          .atPriority(2),
       )
 
       emailServerMock.givenThat(
@@ -46,9 +45,9 @@ abstract class MyFirstEmailClientSpec(
           .withHeader("Content-Type", not(containing("application/json")))
           .willReturn(
             aResponse().withStatus(400)
-              .withBody("""{ "error":  "only application/json accepted" }""")
+              .withBody("""{ "error":  "only application/json accepted" }"""),
           )
-          .atPriority(3)
+          .atPriority(3),
       )
 
       emailServerMock.givenThat(
@@ -57,14 +56,14 @@ abstract class MyFirstEmailClientSpec(
             not(
               matchingJsonSchema(
                 """
-                {
-                  "type": "object",
-                  "properties": {
-                    "to": { "type": "string", "format": "email" },
-                    "from": { "type": "string", "format": "email" },
-                    "subject": { "type": "string" }
-                  }
+              {
+                "type": "object",
+                "properties": {
+                  "to": { "type": "string", "format": "email" },
+                  "from": { "type": "string", "format": "email" },
+                  "subject": { "type": "string" }
                 }
+              }
                 """.trimIndent(),
               ),
             ),
@@ -73,8 +72,8 @@ abstract class MyFirstEmailClientSpec(
             aResponse()
               .withStatus(400)
               .withBody(
-                """{ "error": "invalid_request_format" }"""
-              )
+                """{ "error": "invalid_request_format" }""",
+              ),
           )
           .atPriority(4),
       )
@@ -84,8 +83,8 @@ abstract class MyFirstEmailClientSpec(
           .willReturn(
             aResponse()
               .withStatus(200)
-              .withBody("""{ "status": "sent" }""")
-          )
+              .withBody("""{ "status": "sent" }"""),
+          ),
       )
     }
 
@@ -117,12 +116,12 @@ abstract class MyFirstEmailClientSpec(
           .withRequestBody(
             equalToJson(
               """
-                {
-                  "to" : "recipient@example.com",
-                  "from" : "sender@example.com",
-                  "subject" : "Test Email",
-                  "content" : "Hello, world!"
-                }
+              {
+                "to" : "recipient@example.com",
+                "from" : "sender@example.com",
+                "subject" : "Test Email",
+                "content" : "Hello, world!"
+              }
               """.trimIndent(),
             ),
           ),
@@ -182,5 +181,4 @@ abstract class MyFirstEmailClientSpec(
     beforeTest {
       emailServerMock.resetRequests()
     }
-  },
-)
+  })
